@@ -17,7 +17,7 @@ class NewVisitorTest(unittest.TestCase): #(1)
         self.assertIn('To-Do',header_text)
         # She is invited to enter a to-do item straight away
         inputbox=self.browser.find_element_by_id('id_new_item')
-        self.assertEqual(inputbox.get_attribute('placeholder'),'Enter a to-dp item')
+        self.assertEqual(inputbox.get_attribute('placeholder'),'Enter a to-do item')
         # She types "Buy peacoke feathers" into a text box (Edith's hobby
         # is tying fly-fishing lures)
         inputbox.send_keys('Buy peacock feather')
@@ -27,7 +27,9 @@ class NewVisitorTest(unittest.TestCase): #(1)
         time.sleep(1)
         table=self.browser.find_element_by_id('id_list_table')
         rows=table.find_element_by_tag_name('tr')
-        self.assertTrue(any(row.text=='1:Buy peacock feather'for row in rows))
+        self.assertTrue(any(row.text=='1:Buy peacock feather'for row in rows),
+        "New to-do item did not appear in table"
+        )
         # There is still a text box inviting her to add another item. She
         # enters "Use peacoke feathers to make a fly"(Edith is very methodical)
         self.fail('Finish the test!') #(5)
