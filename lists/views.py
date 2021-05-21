@@ -6,11 +6,9 @@ from lists.models import Item
 # Create your views here.
 def home_page(request):
     if request.method=='POST':
-        new_item_text=request.POST['item_text']
-        Item.objects.create(text=new_item_text)
-        return redirect('/')
-    items=Item.objects.all()
-    return render(request,'home.html',{'items':items})
+        Item.objects.create(text=request.POST['item_text'])
+        return redirect('/lists/the-only-list-in-the-world/')
+    return render(request,'home.html')
     # else:
     #     new_item_text=''
     # item=Item()
@@ -26,3 +24,7 @@ def test_can_save_a_POST_request(self):
     new_item=Item.objects.first()
     self.assertEqual(new_item.text,'A new list item')
     self.assertTemplateUsed(response,'home.html')
+
+def view_list(request):
+    items=Item.objects.all()
+    return render(request,'list.html',{'items':items})

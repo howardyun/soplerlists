@@ -90,7 +90,7 @@ class NewVisitorTest(LiveServerTestCase):  # 把测试写成类，它继承unitt
         self.wait_for_row_in_list_table('1:Buy peacock feathers')
         #She notices that her list has a unique URl
         edith_list_url=self.browser.current_url
-        self.assertRegex(edith_list_url,'/list/.+')
+        self.assertRegex(edith_list_url,'/lists/.+')
 
         #Now a new user , Francis , comes aloneg to the site
         ##We use a new browser session to make sure that no info
