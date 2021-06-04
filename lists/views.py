@@ -14,19 +14,24 @@ def home_page(request):
     # return render(request,'home.html',{'new_item_text':new_item_text,})
     # return HttpResponse('<html><title>To-Do lists</title></html>')
 
-def test_can_save_a_POST_request(self):
-    response=self.client.post('/',data={'item_text':'A new list item'})
+# def test_can_save_a_POST_request(self):
+#     response=self.client.post('/',data={'item_text':'A new list item'})
 
-    self.assertEqual(Item.objects.count(),1)
-    new_item=Item.objects.first()
-    self.assertEqual(new_item.text,'A new list item')
-    self.assertTemplateUsed(response,'home.html')
+#     self.assertEqual(Item.objects.count(),1)
+#     new_item=Item.objects.first()
+#     self.assertEqual(new_item.text,'A new list item')
+#     self.assertTemplateUsed(response,'home.html')
 
-def view_list(request):
-    items=Item.objects.all()
-    return render(request,'list.html',{'items':items})
+def view_list(request,list_id):
+    list_=List.objects.get(id=list_id)
+    return render(request,'list.html',{'list':list_})
 
 def new_list(request):
     list_=List.objects.create()
     Item.objects.create(text=request.POST['item_text'],list=list_)
-    return redirect('/lists/the-only-list-in-the-world/')
+    return redirect(f'/lists/{list_.id}/')
+def add_item(request,list_id):
+    list_=List.objects.get(id=list_id)
+    Item.objects.create(text=request.POST['item_text'],list=list_)
+    return redirect(f'/lists/{list_.id}/')
+    
