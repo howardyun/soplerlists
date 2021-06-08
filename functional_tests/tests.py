@@ -2,37 +2,21 @@ import time
 from selenium import webdriver  # 从selenium引入webdriver
 import unittest
 from selenium.webdriver.common.keys import Keys
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import WebDriverException
+import os
+
 MAX_WAIT=10 
-class NewVisitorTest(LiveServerTestCase):  # 把测试写成类，它继承unittest.TestCase
-  def setUp(self):  # setUp: 每次测试之前运行的特殊方法，用来启动浏览器
-    self.browser = webdriver.Firefox()  # 启动一个selenium webdriver去弹出一个firefox窗口
+class NewVisitorTest(StaticLiveServerTestCase):  # 把测试写成类，它继承unittest.TestCase
+  def setUp(self):
+        self.browser = webdriver.Firefox()
+        staging_server = os.environ.get('STAGING_SERVER')  
+        if staging_server:
+            self.live_server_url = 'http://' + staging_server  
 
   def tearDown(self):  # tearDown: 测试之后运行的特殊方法，用来停止浏览器
     self.browser.quit()
 
-  def test_layout_and_styling(self):
-        # Edith goes to the home page
-        self.browser.get(self.live_server_url)
-        self.browser.set_window_size(1024, 768)
-
-        # She notices the input box is nicely centered
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta=10
-        )
-        inputbox.send_keys('testing')
-        inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1:testing')
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(
-        inputbox.location['x'] + inputbox.size['width'] / 2,
-          512,
-          delta=10
-        )
     
   def wait_for_row_in_list_table(self,row_text):
         start_time=time.time()
@@ -78,7 +62,7 @@ class NewVisitorTest(LiveServerTestCase):  # 把测试写成类，它继承unitt
     # When she hits enter, the page updates, and now the page lists
     # "1: But peacock feathers" as an item in a to-do list
     inputbox.send_keys(Keys.ENTER)
-    self.wait_for_row_in_list_table('1:Buy peacock feathers')
+    self.wait_for_row_in_list_table('1: Buy peacock feathers')
     
     # self.assertIn('1:Buy peacock feathers', [row.text for row in rows])
     # self.assertIn('2:Use peacock feathers to make a fly', [row.text for row in rows])
@@ -91,8 +75,8 @@ class NewVisitorTest(LiveServerTestCase):  # 把测试写成类，它继承unitt
     
 
     # The page updates again, and now shows both items on her list
-    self.wait_for_row_in_list_table('1:Buy peacock feathers')
-    self.wait_for_row_in_list_table('2:Use peacock feathers to make a fly')
+    self.wait_for_row_in_list_table('1: Buy peacock feathers')
+    self.wait_for_row_in_list_table('2: Use peacock feathers to make a fly')
     # self.fail('Finish test')
 
     # Edith wonders whether the site will remember her list.
@@ -108,7 +92,7 @@ class NewVisitorTest(LiveServerTestCase):  # 把测试写成类，它继承unitt
         inputbox=self.browser.find_element_by_id('id_new_item')
         inputbox.send_keys('Buy peacock feathers')
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1:Buy peacock feathers')
+        self.wait_for_row_in_list_table('1: Buy peacock feathers')
         #She notices that her list has a unique URl
         edith_list_url=self.browser.current_url
         self.assertRegex(edith_list_url,'/lists/.+')
@@ -132,7 +116,7 @@ class NewVisitorTest(LiveServerTestCase):  # 把测试写成类，它继承unitt
         inputbox = self.browser.find_element_by_id('id_new_item')
         inputbox.send_keys('Buy milk')
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1:Buy milk')
+        self.wait_for_row_in_list_table('1: Buy milk')
        #Francis gets his own unique URL
         francis_list_url = self.browser.current_url
         self.assertRegex(francis_list_url, '/lists/.+')
@@ -142,6 +126,30 @@ class NewVisitorTest(LiveServerTestCase):  # 把测试写成类，它继承unitt
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
         #Satisfied, they both go back to sleep
+
+  def test_layout_and_styling(self):
+        # Edith goes to the home page
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        # She notices the input box is nicely centered
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta=10
+        )
+        # She starts a new list and sees the input is nicely
+        # centered there too
+        inputbox.send_keys('testing')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: testing')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta=10
+        )
 
       
       
